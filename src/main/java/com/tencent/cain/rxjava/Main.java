@@ -1,18 +1,63 @@
 package com.tencent.cain.rxjava;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
 //        demo();
-        schedulerDemo();
+//        schedulerDemo();
+        operation();
+    }
+
+    /**
+     * 操作符练习
+     */
+    private static void operation() {
+        // map操作符
+        Observable.just(1, 2, 3).map(new Function<Integer, String>() {
+            public String apply(Integer integer) throws Exception {
+                return ++integer + "";
+            }
+        }).subscribe(new Consumer<String>() {
+            public void accept(String s) throws Exception {
+                System.out.println("accept s: " + s);
+            }
+        });
+
+        List<SimulationData> datas = creatData();
+        Observable.fromIterable(datas).flatMap(new Function<SimulationData, ObservableSource<Integer>>() {
+            public ObservableSource<Integer> apply(SimulationData simulationData) throws Exception {
+                return Observable.fromIterable(simulationData.getList());
+            }
+        }).subscribe(new Consumer<Integer>() {
+            public void accept(Integer integer) throws Exception {
+                System.out.println("flatmap accept integer: " + integer);
+            }
+        });
+
+    }
+
+    private static List<SimulationData> creatData() {
+        List<SimulationData> datas = new ArrayList<SimulationData>();
+        for (int i = 0; i < 3; i++) {
+            SimulationData simulationData = new SimulationData();
+            List<Integer> list = new ArrayList<Integer>();
+            for (int j = 0; j < 5; j++) {
+                list.add(i * j);
+            }
+            simulationData.setIndex(i);
+            simulationData.setList(list);
+            datas.add(simulationData);
+        }
+        return datas;
     }
 
     /**
@@ -109,4 +154,5 @@ public class Main {
         });
 
     }
+
 }
