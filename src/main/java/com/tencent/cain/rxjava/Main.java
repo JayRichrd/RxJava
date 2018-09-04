@@ -5,6 +5,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 import java.util.ArrayList;
@@ -43,6 +44,20 @@ public class Main {
             }
         });
 
+        Integer[] array = new Integer[]{1,2,3};
+        Observable.fromArray(array).flatMap(new Function<Integer, ObservableSource<Integer>>() {
+            public ObservableSource<Integer> apply(Integer integer) throws Exception {
+                return Observable.just(integer+1);
+            }
+        }).filter(new Predicate<Integer>() {
+            public boolean test(Integer integer) throws Exception {
+                return integer > 2;
+            }
+        }).take(1).subscribe(new Consumer<Integer>() {
+            public void accept(Integer integer) throws Exception {
+                System.out.println("收到的数字为：" + integer);
+            }
+        });
     }
 
     private static List<SimulationData> creatData() {
